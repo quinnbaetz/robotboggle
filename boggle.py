@@ -5,22 +5,21 @@ http://opensource.org/licenses/BSD-3-Clause
 
 """
 
-import optparse
+
 import random
 
-MIN_LENGTH = 4
+MIN_LENGTH = 2
 DICTIONARY = set()
 PREFIXES = {}
 WIDTH = 5
 HEIGHT = 5
-SCORES = {4: 1, 5: 2, 6: 3, 7: 5, None: 11}
 OFFSETS = [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
 CUBES = [s.lower().split() for s in [
     'S N S U S E',
     'A R Y I F S',
     'O H H L R D',
     'T E T M O T',
-    'J K B X Qu Z',
+    'J K B X Q Z',
     'T E T I I I',
     'E T P S C I',
     'E E E E M A',
@@ -73,15 +72,24 @@ def is_prefix(prefix):
         node = node[letter]
     return True
 
-def find_words(board, positions_used, prefix, pos):
+
+def toNumber(pos):
+    return str(pos[0] + pos[1]*WIDTH)
+
+def find_words(board, positions_used, prefix, pos, buildup="", locMap={}):
     current = prefix + board[pos]
+    add = ","
+    if buildup is "":
+        add = ""
+    buildup = buildup + add +toNumber(pos)
     if not is_prefix(current):
         # No words with this as a prefix
-        return set()
+        return set(), locMap
 
     found = set()
     if current in DICTIONARY:
         found.add(current)
+        locMap[current] = buildup
     positions_used.add(pos)
 
     for offset in OFFSETS:
@@ -91,20 +99,25 @@ def find_words(board, positions_used, prefix, pos):
         if not (0 <= new_pos[0] < WIDTH and 0 <= new_pos[1] < HEIGHT):
             continue
 
-        found.update(find_words(board, positions_used, current, new_pos))
+        newFound, newMap = find_words(board, positions_used, current, new_pos, buildup, locMap)
+        found.update(newFound)
+        locMap.update(newMap)
 
     positions_used.remove(pos)
-    return found
+    return found, locMap
 
 def solve(board):
     words = set()
     for y in range(HEIGHT):
         for x in range(WIDTH):
-            found = find_words(board, set(), '', (x, y))
+            found, locmap = find_words(board, set(), '', (x, y))
             words.update(found)
-    return words
+    return words, locmap
 
-def make_board(letters=None):
+def make_board(width=4, height=4, letters=None):
+    global WIDTH, HEIGHT
+    WIDTH = width
+    HEIGHT = height
     if letters is None:
         cubes = list(CUBES)
         random.shuffle(cubes)
@@ -124,38 +137,14 @@ def print_board(board):
     for y in range(HEIGHT):
         for x in range(WIDTH):
             letter = board[x, y]
-            if letter == 'qu':
-                letter = 'Qu'
-            else:
-                letter = letter.upper()
+            letter = letter.upper()
             print letter,
         print
+    print
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
+            print toNumber((x, y)),
+        print
 
-def main():
-    load_dictionary()
 
-    usage = """Usage: %prog [board_letters]
 
-Example: %prog  T N N H A  I G N E I  S G E I B  C A H N I  O N F O E"""
-    parser = optparse.OptionParser(usage=usage)
-    options, args = parser.parse_args()
-
-    if args:
-        board = make_board(letters=' '.join(args))
-    else:
-        board = make_board()
-
-    print_board(board)
-    print '----'
-    words = solve(board)
-    total_score = 0
-    for word in sorted(words):
-        word_score = SCORES.get(len(word), SCORES[None])
-        total_score += word_score
-        print word
-
-    print '----'
-    print 'Total score:', total_score, 'from', len(words), 'words'
-
-if __name__ == '__main__':
-    main()
