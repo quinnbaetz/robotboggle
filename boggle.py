@@ -126,6 +126,7 @@ def make_board(width=4, height=4, letters=None):
     y = 0
     x = 0
     for letter in letters.split():
+        print "( %s %s => %s )" % (x,y,letter)
         board[x, y] = letter.lower()
         x += 1
         if x >= WIDTH:

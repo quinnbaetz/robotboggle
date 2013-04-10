@@ -32,11 +32,11 @@ def main():
 
     usage = """Usage: %prog [board_letters]
 
-Example: %prog  T N N H A  I G N E I  S G E I B  C A H N I  O N F O E"""
+Example: %prog  T N N H  I G N E  S G E I  C A H N"""
 
     parser = optparse.OptionParser(usage=usage)
     options, args = parser.parse_args()
-
+    print args
     if args:
         board = boggle.make_board(width=WIDTH, height=HEIGHT, letters=' '.join(args))
     else:
