@@ -9,6 +9,6 @@ You can run it without arguments to generate a random board and solve it:
 
 Or with 25 letters representing a board to specify the board:
 
-    python boggle  T N N H A  I G N E I  S G E I B  C A H N I  O N F O E
+    python boggle  T N H A  G N E I G E I B C A H N
 
 This code is free to use under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause).

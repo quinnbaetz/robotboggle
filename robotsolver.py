@@ -28,7 +28,7 @@ def convertToCoordinates(num):
 
 
 def main():
-    boggle.load_dictionary()
+
 
     usage = """Usage: %prog [board_letters]
 
@@ -36,11 +36,14 @@ Example: %prog  T N N H  I G N E  S G E I  C A H N"""
 
     parser = optparse.OptionParser(usage=usage)
     options, args = parser.parse_args()
-    print args
+    if len(args) is not 16:
+        print "You typed in the wrong number of letters, %s should be 16try again" % len(args)
+        return
+
+    boggle.load_dictionary()
+
     if args:
         board = boggle.make_board(width=WIDTH, height=HEIGHT, letters=' '.join(args))
-    else:
-        board = boggle.make_board(width=WIDTH, height=HEIGHT)
 
     boggle.print_board(board)
     print '----'
@@ -56,8 +59,6 @@ Example: %prog  T N N H  I G N E  S G E I  C A H N"""
             finger.drag(*convertToCoordinates(loc))
         finger.up()
         print
-
-
 
 
 
